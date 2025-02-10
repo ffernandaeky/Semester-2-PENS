@@ -1,0 +1,49 @@
+---
+title: "book1"
+author: "Eky Fernanda"
+date: "2023-05-14"
+output: word_document
+---
+
+```{r}
+df = read.csv("C:/Users/ekyfe/Documents/college/Semester 2/Permodelan Statistika/project UAS/economic.csv")
+head(df)
+
+library(MASS)
+```
+```{r}
+str(df)
+```
+
+```{r}
+summary(df)
+```
+```{r}
+library(ggplot2)
+ggplot(df, aes(x = tingkatpengangguran, y = pengalamankerja)) +  geom_boxplot() + xlab("tingkatpengangguran") + ylab("Pengalaman Kerja (tahun)") + ggtitle("Boxplot Pengalaman Kerja berdasarkan Tingkat Pengangguran")
+```
+
+```{r}
+df$tingkatekonomi <- factor(df$tingkatekonomi)
+model_fit <- polr(tingkatekonomi ~ usia + pengalamankerja + tingkatpengangguran + pendidikan, data = df, Hess = TRUE)
+summary(model_fit)
+```
+```{r}
+summary_table <- coef(summary(model_fit))
+pval <- pnorm(abs(summary_table[, "t value"]),lower.tail =
+FALSE)* 2
+summary_table <- cbind(summary_table, "p value" = round(pval,3))
+summary_table
+```
+```{r}
+pengangguran_counts <- table(df$tingkatpengangguran)
+pengangguran_counts
+```
+
+```{r}
+library(MASS)
+df <- data.frame ("usia", "pendidikan","pengalamankerja","tingkatekonomi","tingkatpengangguran")
+round(predict(model_fit,df,type = "p"), 3)
+```
+
+

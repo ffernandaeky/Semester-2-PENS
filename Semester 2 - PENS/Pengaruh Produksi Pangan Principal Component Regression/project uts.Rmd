@@ -1,0 +1,114 @@
+---
+title: "project UTS"
+author: "Eky Fernanda"
+date: "2023-04-03"
+output: word_document
+---
+
+```{r}
+#membaca dataset
+zerohunger = read.csv("C:/Users/ekyfe/Documents/Semester 2/Permodelan Statistika/project UTS/zerohunger.csv")
+zerohunger = zerohunger[,2:6]
+zerohunger
+```
+```{r}
+#Model OLS
+model = lm(pangan~., data = zerohunger)
+summary(model)
+```
+```{r}
+# remove the first column (zerohunger) from the data matriks
+zerohungerX = zerohunger[,-1]
+# Alternately, keep all but the first column
+# Perform Principal Component Analysis
+zerohungerX.pca = prcomp(zerohungerX, center = TRUE, scale = TRUE)
+plot(zerohungerX.pca, type="lines") 
+```
+```{r}
+#Ringkasan Komponen Utama
+summary(zerohungerX.pca)
+```
+```{r}
+# Here is the rotation matrix:
+print(zerohungerX.pca$rotation)
+# Note that the first principal component is nearly proportional to the sum of all the standardized original variables
+```
+```{r}
+# Notice that the diagonal of the covariance matrix of the PCA results
+# is the same as the eigenvalues of the original data
+eigen(cor(zerohungerX))$values
+diag(var(zerohungerX.pca$x[,]))
+```
+```{r}
+# the new rotated components are contained in zerohunger.pca$x
+# double check that the new principal components are orthogonal
+cor(zerohungerX.pca$x)
+```
+```{r}
+# We can also look at the correlation between the original predictor variables
+# and the new principal components
+cor(cbind(zerohunger[,-1],data.frame(zerohungerX.pca$x)))
+```
+```{r}
+# Let's make a data frame with zerohunger in the first column, and
+# the principal components in the rest of the columns
+zerohunger.pca = cbind(zerohunger[,1],data.frame(zerohungerX.pca$x))
+colnames(zerohunger.pca)[1] <- "pangan"
+# now, let's look at the correlation matrix, showing the correlation
+#of zerohunger to each principal component 
+cor(zerohunger.pca)[,1]
+# Notice that two of the PC's have very low correlation with zerohunger
+```
+```{r}
+# Let's compute a full model
+zerohunger.pcr1 <- lm(pangan ~., data = zerohunger.pca)
+summary(zerohunger.pcr1)
+```
+```{r}
+# We can find the model coefficeints in terms of the original variables
+#by multiplying by the rotation matrix
+betas1 = zerohungerX.pca$rotation %*% zerohunger.pcr1$coefficients[-1]
+betas1
+```
+```{r}
+zerohunger.pcr2 <- lm(pangan ~ PC1+PC2+PC4, data = zerohunger.pca)
+summary(zerohunger.pcr2)
+```
+```{r}
+anova(zerohunger.pcr1,zerohunger.pcr2)
+```
+```{r}
+library(leaps)
+leaps<-regsubsets(pangan~., data=zerohunger.pca, method = "exhaustive")
+library(car)
+```
+```{r}
+fullmodelcoef = zerohunger.pcr1$coefficients[-1]
+fullmodelcoef["PC3"] = 0
+fullmodelcoef["PC4"] = 0
+betas2 = zerohungerX.pca$rotation %*% fullmodelcoef
+betas2
+```
+```{r}
+for( i in 1:5){
+  hist(zerohunger[,i], main = colnames(zerohunger)[i],
+       xlabel = colnames(zerohunger)[i], col='cyan')
+}
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
