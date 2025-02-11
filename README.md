@@ -1,6 +1,6 @@
 # Semester 2 Project
 
-This is a second semester project that I got while studying at the Surabaya State Electronics Polytechnic Applied Data Science study program
+This is a second semester project that I got while studying at the Electronics Engineering Polytechnic Institute of Surabaya Applied Data Science study program
 
 ## Analisis Online Game Menggunakan Web Scrapping
 
